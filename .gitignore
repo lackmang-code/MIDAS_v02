@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+
+# 생성된 출력물 (로컬 전용)
+output/*
+!output/.gitkeep
+
+# 환경
+.env
+.venv
+venv/
+*.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Windows 실행파일 (Streamlit Cloud 불필요)
+run.bat

@@ -1,0 +1,24 @@
+# MIDAS_v02 Property Config — Aqueous Solubility (logS)
+# 다물성 확장 검증용 샘플 물성. ESOL/Delaney 출처 분자 일부.
+name:                solubility
+display_name:        수용해도 (Aqueous logS)
+domain:              약물·기능성 분자의 수용성 스크리닝
+description_short:   logS (mol/L). 값이 높을수록 물에 잘 녹음
+
+dataset_file:        dataset.csv
+smiles_column:       smiles
+target_column:       logS
+unit:                log(mol/L)
+
+task_type:           regression
+log_transform:       false        # logS 자체가 이미 로그 스케일
+stratify_bins:       [-6.0, -4.0, -2.0, 0.0]
+
+direction:           higher_better
+screening_threshold: -2.0          # logS > -2 면 충분한 가용성
+training_threshold:  null
+
+descriptor_emphasis: [MolLogP, TPSA, NumHDonors, NumHAcceptors, MolWt, NumRotatableBonds]
+
+extra:
+  notes: ESOL Delaney 2004 subset

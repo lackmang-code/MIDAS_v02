@@ -1,0 +1,52 @@
+smiles,logS,name,source
+CCO,1.10,Ethanol,Delaney2004
+CCCCCCCC,-5.24,Octane,Delaney2004
+c1ccccc1,-1.64,Benzene,Delaney2004
+Cc1ccccc1,-2.21,Toluene,Delaney2004
+CCCCO,-0.03,1-Butanol,Delaney2004
+CCCCCO,-0.59,1-Pentanol,Delaney2004
+CCCCCCO,-1.24,1-Hexanol,Delaney2004
+CCCCCCCO,-1.81,1-Heptanol,Delaney2004
+CCCCCCCCO,-2.35,1-Octanol,Delaney2004
+OCCO,1.36,Ethylene glycol,Delaney2004
+OCCCO,1.32,"1,3-Propanediol",Delaney2004
+CC(C)O,0.43,2-Propanol,Delaney2004
+CC(=O)C,0.51,Acetone,Delaney2004
+CC(=O)CC,0.30,2-Butanone,Delaney2004
+CCOCC,-0.09,Diethyl ether,Delaney2004
+ClCCl,-1.06,Dichloromethane,Delaney2004
+ClC(Cl)Cl,-1.96,Chloroform,Delaney2004
+ClC(Cl)(Cl)Cl,-2.31,Carbon tetrachloride,Delaney2004
+Clc1ccccc1,-2.45,Chlorobenzene,Delaney2004
+Clc1ccc(Cl)cc1,-3.27,"1,4-Dichlorobenzene",Delaney2004
+c1ccc2ccccc2c1,-3.61,Naphthalene,Delaney2004
+c1ccc2cc3ccccc3cc2c1,-4.92,Anthracene,Delaney2004
+c1ccc(-c2ccccc2)cc1,-3.98,Biphenyl,Delaney2004
+Oc1ccccc1,-0.36,Phenol,Delaney2004
+Nc1ccccc1,-0.40,Aniline,Delaney2004
+CC(=O)O,1.22,Acetic acid,Delaney2004
+CCC(=O)O,0.83,Propionic acid,Delaney2004
+CCCC(=O)O,0.20,Butyric acid,Delaney2004
+CCCCCC(=O)O,-0.99,Hexanoic acid,Delaney2004
+NC(=O)N,0.96,Urea,Delaney2004
+CC#N,0.32,Acetonitrile,Delaney2004
+O=Cc1ccccc1,-1.04,Benzaldehyde,Delaney2004
+CC(=O)c1ccccc1,-1.41,Acetophenone,Delaney2004
+CCCCCCCCCCCC,-7.96,Dodecane,Delaney2004
+C1CCCCC1,-3.10,Cyclohexane,Delaney2004
+CC1CCCCC1,-3.45,Methylcyclohexane,Delaney2004
+OC1CCCCC1,-0.45,Cyclohexanol,Delaney2004
+NC(=O)c1ccccc1,-0.71,Benzamide,Delaney2004
+COc1ccccc1,-1.85,Anisole,Delaney2004
+CCOC(=O)C,-0.18,Ethyl acetate,Delaney2004
+CCOC(=O)CC,-0.66,Ethyl propanoate,Delaney2004
+NCCN,1.10,Ethylenediamine,Delaney2004
+N(CC)(CC)CC,-1.43,Triethylamine,Delaney2004
+O=C(O)c1ccccc1,-1.50,Benzoic acid,Delaney2004
+O=C(O)c1ccccc1O,-1.83,Salicylic acid,Delaney2004
+CC(C)(C)O,0.35,tert-Butanol,Delaney2004
+Cc1ccc(C)cc1,-2.77,p-Xylene,Delaney2004
+Cc1cccc(C)c1,-2.82,m-Xylene,Delaney2004
+Cc1ccccc1C,-2.77,o-Xylene,Delaney2004
+ClCCCl,-1.18,"1,2-Dichloroethane",Delaney2004
+FC(F)(F)C(F)(F)F,-3.15,Hexafluoroethane,Delaney2004

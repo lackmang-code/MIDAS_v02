@@ -1,0 +1,24 @@
+# MIDAS_v02 Property Config — Dielectric Constant (k)
+# v01에서 사용한 설정을 그대로 옮긴 것
+name:                dielectric
+display_name:        유전율 (Dielectric Constant)
+domain:              OLED 박막봉지(TFE)용 저유전율 유기막
+description_short:   값이 낮을수록 신호 손실/RC 지연이 적은 우수 재료
+
+dataset_file:        dataset.csv
+smiles_column:       smiles
+target_column:       k_exp
+unit:                "—"
+
+task_type:           regression
+log_transform:       true
+stratify_bins:       [2.0, 3.0, 5.0, 10.0]
+
+direction:           lower_better
+screening_threshold: 2.4
+training_threshold:  3.5
+
+descriptor_emphasis: [MolLogP, TPSA, MolMR, n_F, n_Si, fluoro_degree]
+
+extra:
+  ultra_low_threshold: 2.0
