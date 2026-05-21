@@ -20,7 +20,13 @@ from typing import Any
 # 라우팅용 import는 lazy — 큰 v01 템플릿을 매번 로드하지 않음
 def _route(cfg_name: str):
     if cfg_name == "dielectric":
-        from . import _paper_dielectric as mod
+        try:
+            from . import _paper_dielectric as mod
+        except SyntaxError as _se:
+            raise RuntimeError(
+                f"SyntaxError in _paper_dielectric.py "
+                f"line={_se.lineno} msg={_se.msg!r} text={_se.text!r}"
+            ) from _se
     else:
         from . import _paper_generic as mod
     return mod
