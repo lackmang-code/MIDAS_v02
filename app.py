@@ -615,6 +615,22 @@ def render_s5():
                 )
                 st.session_state["paper"] = paper
 
+                # 논문 삽입용 그림 생성 (Fig1~6) — 실패해도 논문은 진행
+                try:
+                    figures = generate_paper_figures(
+                        property_name = cfg.name,
+                        feat_imp      = feat_imp,
+                        metrics       = res["metrics"],
+                        df_screening  = st.session_state["s4_result"],
+                        k_threshold   = cfg.screening_threshold,
+                        best_model    = res.get("cv", {}).get("best_model", "gbr"),
+                        splits        = res.get("splits"),
+                    )
+                except Exception as e:
+                    figures = {}
+                    st.warning(f"⚠️ 그림 생성 실패 (논문은 그림 없이 진행): {e}")
+                st.session_state["paper_figures"] = figures
+
                 # 자동 저장 — MD + DOCX + TEX 세 형식 모두
                 os.makedirs(OUTPUT_DIR, exist_ok=True)
                 now_str   = _dt.now().strftime("%Y%m%d_%H%M%S")
@@ -629,7 +645,7 @@ def render_s5():
 
                 # Word (.docx)
                 try:
-                    docx_data = paper_to_docx(paper, figures=None,
+                    docx_data = paper_to_docx(paper, figures=figures,
                                               property_name=cfg.name)
                     docx_path = base_path + ".docx"
                     with open(docx_path, "wb") as f:
@@ -722,7 +738,9 @@ def render_s5():
     st.markdown("#### 다운로드")
     col_d1, col_d2, col_d3 = st.columns(3)
 
-    docx_bytes = paper_to_docx(paper, figures=None, property_name=cfg.name)
+    docx_bytes = paper_to_docx(paper,
+                               figures=st.session_state.get("paper_figures", {}),
+                               property_name=cfg.name)
     col_d1.download_button(
         "⬇ Word (.docx)", data=docx_bytes,
         file_name=f"{cfg.name}_paper.docx",

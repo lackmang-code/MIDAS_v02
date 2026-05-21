@@ -388,6 +388,9 @@ logRMSE = {cv_rmse:.4f}
 [FIG:model_perf]
 *Fig. 2. Comparison of Train/Val/Test R² for each ML model. ⭐: auto-selected best model ({bm}). / 모델별 R² 비교, ⭐: 최적 모델.*
 
+[FIG:parity]
+*Fig. 5. Parity plot ({bm} model): predicted vs. experimental k for Train/Val/Test sets. Dashed line: y = x (perfect prediction). / {bm} 모델의 예측-실험 산점도 (Train/Val/Test).*
+
 ### 3.3 피처 중요도 분석
 
 {_feat_importance_discussion(top5_feat, top5_imp)}
@@ -418,6 +421,9 @@ logRMSE = {cv_rmse:.4f}
 
 [FIG:mol_grid]
 *Fig. 4. 스크리닝 상위 6종 후보 분자 구조 (RDKit Draw, k 예측값 표시).*
+
+[FIG:williams]
+*Fig. 6. Williams plot: standardized residuals vs. leverage. Vertical dashed line: warning leverage h* = 3(p+1)/n ≈ {h_star:.4f}; horizontal dotted lines: ±3σ residual. Points outside this region indicate AD-outside structures or outliers. / Williams 플롯 — AD 외부·이상치 식별.*
 """
 
     # ── 3.5절 가설 검증 요약 (results에 통합) ────────────────────────────────
@@ -888,9 +894,13 @@ def generate_paper_figures(
     df_screening: pd.DataFrame,
     k_threshold:  float = 2.4,
     best_model:   str   = "gbr",
+    splits:       dict | None = None,
 ) -> dict:
     """
-    논문 삽입용 그림 4개를 생성하여 PNG bytes dict로 반환.
+    논문 삽입용 그림 6개를 생성하여 PNG bytes dict로 반환.
+
+    splits: ml_result["splits"] = {"X_tr","X_val","X_te","y_tr","y_val","y_te"}
+            Williams plot에 필요 (없으면 Fig 6은 건너뜀).
 
     Returns
     -------
@@ -899,6 +909,8 @@ def generate_paper_figures(
       "model_perf" : PNG bytes — 모델별 R² 비교 막대
       "screening"  : PNG bytes — 스크리닝 상위 후보 예측 k
       "mol_grid"   : PNG bytes — 분자 구조 그리드 (RDKit)
+      "parity"     : PNG bytes — Parity plot (Pred vs Exp, best model)
+      "williams"   : PNG bytes — Williams plot (leverage vs std residual)
     }
     """
     import matplotlib
@@ -1057,6 +1069,107 @@ def generate_paper_figures(
                 figs["mol_grid"] = mol_bytes
     except Exception as e:
         print(f"[generate_paper_figures] Fig4 실패: {e}")
+
+    # ── Fig 5: Parity plot (best model: Train/Val/Test) ──────────────────────
+    try:
+        bm = best_model.lower()
+        if bm in metrics:
+            sets    = [("train", "#3498DB"), ("val", "#F39C12"), ("test", "#E74C3C")]
+            fig, ax = plt.subplots(figsize=(6.5, 6.5))
+            all_vals = []
+            for split_name, color in sets:
+                m_split = metrics[bm].get(split_name, {})
+                y_t = np.asarray(m_split.get("y_true", []))
+                y_p = np.asarray(m_split.get("y_pred", []))
+                if len(y_t) and len(y_p):
+                    ax.scatter(y_t, y_p, c=color, s=42, alpha=0.75,
+                               edgecolors="white", linewidth=0.6,
+                               label=f"{split_name.capitalize()} "
+                                     f"(R²={m_split.get('R2', 0):.3f})")
+                    all_vals.extend(y_t.tolist() + y_p.tolist())
+
+            if all_vals:
+                lo, hi = float(min(all_vals)), float(max(all_vals))
+                pad = (hi - lo) * 0.05 if hi > lo else 0.1
+                ax.plot([lo - pad, hi + pad], [lo - pad, hi + pad],
+                        "k--", lw=1, alpha=0.6, label="y = x")
+                ax.set_xlim(lo - pad, hi + pad)
+                ax.set_ylim(lo - pad, hi + pad)
+                ax.set_aspect("equal", adjustable="box")
+
+            ax.set_xlabel("Experimental k", fontsize=11)
+            ax.set_ylabel("Predicted k", fontsize=11)
+            ax.set_title(
+                f"Fig. 5. Parity plot — {bm.upper()} model\n"
+                f"실험값 vs 예측값 ({bm.upper()})",
+                fontsize=11, fontweight="bold")
+            ax.legend(fontsize=9, loc="upper left")
+            ax.grid(alpha=0.3)
+            plt.tight_layout()
+            figs["parity"] = _fig_to_bytes(fig)
+            plt.close(fig)
+    except Exception as e:
+        print(f"[generate_paper_figures] Fig5 (parity) 실패: {e}")
+
+    # ── Fig 6: Williams plot (leverage vs standardized residuals) ────────────
+    try:
+        bm = best_model.lower()
+        if splits and bm in metrics:
+            from engines.ml_engine import calc_leverage
+            X_tr  = splits.get("X_tr")
+            X_val = splits.get("X_val")
+            X_te  = splits.get("X_te")
+
+            m_tr = metrics[bm].get("train", {})
+            m_va = metrics[bm].get("val",   {})
+            m_te = metrics[bm].get("test",  {})
+
+            r_tr = (np.asarray(m_tr.get("y_true", [])) -
+                    np.asarray(m_tr.get("y_pred", [])))
+            r_va = (np.asarray(m_va.get("y_true", [])) -
+                    np.asarray(m_va.get("y_pred", [])))
+            r_te = (np.asarray(m_te.get("y_true", [])) -
+                    np.asarray(m_te.get("y_pred", [])))
+
+            all_r = np.concatenate([r_tr, r_va, r_te])
+            if X_tr is not None and len(all_r) and all_r.std(ddof=1) > 0:
+                rsd = float(all_r.std(ddof=1))
+                std_tr, std_va, std_te = r_tr / rsd, r_va / rsd, r_te / rsd
+
+                h_tr, h_star = calc_leverage(X_tr, X_tr)
+                h_va = calc_leverage(X_tr, X_val)[0] if X_val is not None else np.array([])
+                h_te = calc_leverage(X_tr, X_te)[0]  if X_te  is not None else np.array([])
+
+                fig, ax = plt.subplots(figsize=(8, 5.5))
+                if len(h_tr) == len(std_tr):
+                    ax.scatter(h_tr, std_tr, c="#3498DB", s=38, alpha=0.65,
+                               edgecolors="white", linewidth=0.5, label="Train")
+                if len(h_va) == len(std_va):
+                    ax.scatter(h_va, std_va, c="#F39C12", s=55, alpha=0.85,
+                               edgecolors="white", linewidth=0.5, label="Val")
+                if len(h_te) == len(std_te):
+                    ax.scatter(h_te, std_te, c="#E74C3C", s=55, alpha=0.85,
+                               edgecolors="white", linewidth=0.5, label="Test")
+
+                ax.axvline(h_star, color="red", ls="--", lw=1.5,
+                           label=f"h* = 3(p+1)/n = {h_star:.3f}")
+                ax.axhline( 3, color="gray", ls=":", lw=1.2, label="±3σ")
+                ax.axhline(-3, color="gray", ls=":", lw=1.2)
+                ax.axhline( 0, color="black", lw=0.5, alpha=0.4)
+
+                ax.set_xlabel("Leverage (h)", fontsize=11)
+                ax.set_ylabel("Standardized residual", fontsize=11)
+                ax.set_title(
+                    "Fig. 6. Williams plot — Applicability domain & outliers\n"
+                    "Williams 플롯 (적용 도메인 + 이상치)",
+                    fontsize=11, fontweight="bold")
+                ax.legend(fontsize=9, loc="best")
+                ax.grid(alpha=0.3)
+                plt.tight_layout()
+                figs["williams"] = _fig_to_bytes(fig)
+                plt.close(fig)
+    except Exception as e:
+        print(f"[generate_paper_figures] Fig6 (williams) 실패: {e}")
 
     return figs
 
