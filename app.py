@@ -679,6 +679,7 @@ def render_s5():
                 f"최적 모델: {bm_label}  |  모드: {mode_lbl}  |  CV R²: {cv_r2:.3f}"
             )
             st.success("✅ 논문 초안 생성 완료!")
+            st.rerun()
         return
 
     paper = st.session_state["paper"]
