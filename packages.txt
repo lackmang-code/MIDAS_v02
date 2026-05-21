@@ -1,0 +1,4 @@
+libxrender1
+libxext6
+libgl1-mesa-glx
+libcairo2
