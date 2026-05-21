@@ -598,21 +598,27 @@ def render_s5():
                 "orcid":       st.session_state.get("s5_author_orcid", ""),
             }
             with st.spinner("논문 초안 생성 중..."):
-                paper = generate_paper(
-                    cfg=cfg,
-                    df_dataset    = df,
-                    feat_names    = st.session_state["feat_names"],
-                    X_all_shape   = st.session_state["X_all"].shape,
-                    cv_result     = res["cv"],
-                    metrics       = res["metrics"],
-                    df_screening  = st.session_state["s4_result"],
-                    feat_imp      = feat_imp,
-                    log_tf        = res.get("log_tf", cfg.log_transform),
-                    best_model    = res.get("cv", {}).get("best_model", "gbr"),
-                    model_mode    = res.get("mode", "full"),
-                    author_info   = author_info,
-                    acknowledgments = st.session_state.get("s5_ack", ""),
-                )
+                try:
+                    paper = generate_paper(
+                        cfg=cfg,
+                        df_dataset    = df,
+                        feat_names    = st.session_state["feat_names"],
+                        X_all_shape   = st.session_state["X_all"].shape,
+                        cv_result     = res["cv"],
+                        metrics       = res["metrics"],
+                        df_screening  = st.session_state["s4_result"],
+                        feat_imp      = feat_imp,
+                        log_tf        = res.get("log_tf", cfg.log_transform),
+                        best_model    = res.get("cv", {}).get("best_model", "gbr"),
+                        model_mode    = res.get("mode", "full"),
+                        author_info   = author_info,
+                        acknowledgments = st.session_state.get("s5_ack", ""),
+                    )
+                except Exception as _e:
+                    import traceback as _tb
+                    st.error(f"[DEBUG] {type(_e).__name__}: {_e}")
+                    st.code(_tb.format_exc())
+                    st.stop()
                 st.session_state["paper"] = paper
 
                 # 논문 삽입용 그림 생성 (Fig1~6) — 실패해도 논문은 진행
