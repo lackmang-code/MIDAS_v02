@@ -1671,7 +1671,8 @@ def _md_to_latex(md: str) -> str:
             if not in_enum:
                 out.append("\\begin{enumerate}")
                 in_enum = True
-            out.append(f"  \\item {_inline_latex(re.sub(r'^\\d+\\. ', '', line))}")
+            _line_clean = re.sub(r'^\d+\. ', '', line)
+            out.append(f"  \\item {_inline_latex(_line_clean)}")
             i += 1
             if i >= len(lines) or not re.match(r"^\d+\. ", lines[i]):
                 out.append("\\end{enumerate}")
