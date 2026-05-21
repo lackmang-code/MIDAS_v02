@@ -618,7 +618,6 @@ def render_s5():
                 # 논문 삽입용 그림 생성 (Fig1~6) — 실패해도 논문은 진행
                 try:
                     figures = generate_paper_figures(
-                        property_name = cfg.name,
                         feat_imp      = feat_imp,
                         metrics       = res["metrics"],
                         df_screening  = st.session_state["s4_result"],
