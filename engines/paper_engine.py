@@ -22,11 +22,11 @@ def _route(cfg_name: str):
     if cfg_name == "dielectric":
         try:
             from . import _paper_dielectric as mod
-        except SyntaxError as _se:
+        except BaseException as _se:
             raise RuntimeError(
-                f"SyntaxError in _paper_dielectric.py "
-                f"line={_se.lineno} msg={_se.msg!r} text={_se.text!r}"
-            ) from _se
+                f"{type(_se).__name__} in _paper_dielectric.py: "
+                f"{getattr(_se,'lineno',None)} | {getattr(_se,'msg',None)} | {getattr(_se,'text',None)!r}"
+            ) from None
     else:
         from . import _paper_generic as mod
     return mod
